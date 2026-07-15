@@ -66,6 +66,10 @@ body.page-loader-active {
   transition: opacity 260ms ease, visibility 0s linear 260ms;
 }
 
+.page-loader.is-instant {
+  transition: none;
+}
+
 .page-loader.is-visible {
   opacity: 1;
   visibility: visible;

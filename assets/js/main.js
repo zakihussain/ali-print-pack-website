@@ -17,6 +17,18 @@ const loaderWhiteSrc = new URL("../images/logo/loader-white.png", mainScriptSrc)
 const loaderWord1Src = new URL("../images/logo/logo word 1.png", mainScriptSrc).href;
 const loaderWord2Src = new URL("../images/logo/logo word 2.png", mainScriptSrc).href;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const previousLoaderMode = sessionStorage.getItem("app-loader-mode");
+const previousLoaderTimestamp = Number(sessionStorage.getItem("app-loader-timestamp") || 0);
+const arrivedFromPageTransition =
+  previousLoaderMode === "page-transition" && Date.now() - previousLoaderTimestamp < 5000;
+
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
+if (arrivedFromPageTransition) {
+  window.scrollTo(0, 0);
+}
 
 const setupHeaderColorLine = () => {
   if (!header) return;
@@ -75,38 +87,42 @@ const pageLoader = createPageLoader();
 
 const showPageLoader = (animate = true) => {
   if (!pageLoader) return;
-  document.documentElement.classList.remove("page-preload");
+  pageLoader.classList.add("is-instant");
   document.body.classList.add("page-loader-active");
   pageLoader.classList.toggle("is-cover", !animate);
   pageLoader.classList.add("is-visible");
+  void pageLoader.offsetWidth;
+  document.documentElement.classList.remove("page-preload");
   pageLoader.classList.remove("is-animating");
   if (animate) {
     void pageLoader.offsetWidth;
     pageLoader.classList.add("is-animating");
   }
+  window.requestAnimationFrame(() => {
+    pageLoader.classList.remove("is-instant");
+  });
 };
 
 const hidePageLoader = () => {
   if (!pageLoader) return;
   document.documentElement.classList.remove("page-preload");
-  pageLoader.classList.remove("is-visible", "is-animating", "is-cover");
+  pageLoader.classList.remove("is-visible", "is-animating", "is-cover", "is-instant");
   document.body.classList.remove("page-loader-active");
 };
 
 const setupPageLoader = () => {
-  const previousMode = sessionStorage.getItem("app-loader-mode");
-  const previousTimestamp = Number(sessionStorage.getItem("app-loader-timestamp") || 0);
-  const arrivedFromTransition =
-    previousMode === "page-transition" && Date.now() - previousTimestamp < 5000;
-
   sessionStorage.removeItem("app-loader-mode");
   sessionStorage.removeItem("app-loader-timestamp");
 
   showPageLoader(true);
 
-  const hideDelay = reducedMotionQuery.matches ? 120 : arrivedFromTransition ? 1680 : 2780;
+  const hideDelay = reducedMotionQuery.matches ? 120 : arrivedFromPageTransition ? 2920 : 2780;
 
   window.addEventListener("load", () => {
+    if (arrivedFromPageTransition) {
+      window.scrollTo(0, 0);
+      updateHeader();
+    }
     window.setTimeout(hidePageLoader, hideDelay);
   });
 
@@ -398,6 +414,116 @@ const setupCopyButtons = () => {
   });
 };
 
+const buildFlagEmoji = (countryCode) => {
+  if (!countryCode || countryCode.length !== 2) return "";
+  return countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join("");
+};
+
+const setupQuoteCountryPhone = () => {
+  const countrySelect = document.querySelector("[data-country-select]");
+  const phoneCodeInput = document.querySelector("[data-phone-code-input]");
+  const phoneLocalInput = document.querySelector("[data-phone-local-input]");
+  const phoneFullInput = document.querySelector("[data-phone-full-input]");
+  if (!countrySelect || !phoneCodeInput || !phoneLocalInput || !phoneFullInput) return;
+
+  const countryApi =
+    window.intlTelInput && typeof window.intlTelInput.getCountryData === "function"
+      ? window.intlTelInput
+      : window.intlTelInputGlobals &&
+          typeof window.intlTelInputGlobals.getCountryData === "function"
+        ? window.intlTelInputGlobals
+        : null;
+  if (!countryApi) return;
+
+  const countryNameInput = document.querySelector("[data-country-name]");
+  const countryIsoInput = document.querySelector("[data-country-iso]");
+  const countryDialCodeInput = document.querySelector("[data-country-dial-code]");
+  const countries = countryApi
+    .getCountryData()
+    .filter((country) => country.iso2 && country.dialCode && country.name);
+
+  const phonePlaceholders = {
+    pk: "XXXXXXXXXX",
+    us: "XXXXXXXXXX",
+    gb: "XXXXXXXXXX",
+    ae: "XXXXXXXXX",
+    sa: "XXXXXXXXX",
+    qa: "XXXXXXXX",
+    kw: "XXXXXXXX",
+    om: "XXXXXXXX",
+    bh: "XXXXXXXX",
+    de: "XXXXXXXXXX",
+    fr: "XXXXXXXXX",
+    it: "XXXXXXXXXX",
+    es: "XXXXXXXXX",
+    cn: "XXXXXXXXXXX",
+    in: "XXXXXXXXXX",
+  };
+
+  countrySelect.innerHTML = "";
+
+  countries.forEach((country) => {
+    const option = document.createElement("option");
+    option.value = country.name;
+    option.textContent = `${buildFlagEmoji(country.iso2)} ${country.name} (+${country.dialCode})`;
+    option.dataset.iso2 = country.iso2;
+    option.dataset.dialCode = country.dialCode;
+    countrySelect.append(option);
+  });
+
+  const applyCountry = (iso2, forcePrefix = false) => {
+    const selectedCountry =
+      countries.find((country) => country.iso2 === iso2) ||
+      countries.find((country) => country.iso2 === "pk") ||
+      countries[0];
+    if (!selectedCountry) return;
+
+    const selectedOption = Array.from(countrySelect.options).find(
+      (option) => option.dataset.iso2 === selectedCountry.iso2
+    );
+    if (selectedOption) countrySelect.value = selectedOption.value;
+
+    if (countryNameInput) countryNameInput.value = selectedCountry.name;
+    if (countryIsoInput) countryIsoInput.value = selectedCountry.iso2;
+    if (countryDialCodeInput) countryDialCodeInput.value = `+${selectedCountry.dialCode}`;
+    phoneCodeInput.value = `+${selectedCountry.dialCode}`;
+    phoneLocalInput.placeholder = phonePlaceholders[selectedCountry.iso2] || "XXXXXXXXXX";
+    if (forcePrefix && !phoneLocalInput.value.trim()) {
+      phoneFullInput.value = `+${selectedCountry.dialCode}`;
+    } else {
+      phoneFullInput.value = phoneLocalInput.value.trim()
+        ? `+${selectedCountry.dialCode} ${phoneLocalInput.value.trim()}`
+        : `+${selectedCountry.dialCode}`;
+    }
+  };
+
+  const initialIso =
+    countryIsoInput?.value?.toLowerCase() ||
+    countrySelect.getAttribute("value") ||
+    countrySelect.dataset.initialCountry ||
+    "pk";
+
+  applyCountry(initialIso, false);
+
+  countrySelect.addEventListener("change", () => {
+    const selectedIso = countrySelect.selectedOptions[0]?.dataset.iso2 || "pk";
+    applyCountry(selectedIso, true);
+    phoneLocalInput.focus();
+  });
+
+  phoneLocalInput.addEventListener("input", () => {
+    phoneLocalInput.value = phoneLocalInput.value.replace(/[^\d\s-]/g, "");
+    const currentDialCode = countryDialCodeInput?.value || phoneCodeInput.value;
+    phoneFullInput.value = phoneLocalInput.value.trim()
+      ? `${currentDialCode} ${phoneLocalInput.value.trim()}`
+      : currentDialCode;
+  });
+};
+
 const closeMenu = () => {
   if (!menuButton || !menu) return;
   menuButton.setAttribute("aria-expanded", "false");
@@ -445,3 +571,4 @@ setupPageLoader();
 setupPageTransitions();
 setupBrandLoop();
 setupCopyButtons();
+setupQuoteCountryPhone();

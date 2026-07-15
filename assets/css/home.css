@@ -264,12 +264,14 @@
 
 .home-header .header-cta i {
   display: grid;
+  flex: 0 0 46px;
   width: 46px;
   min-height: 46px;
   place-items: center;
   border-left: 1px solid rgba(16, 27, 28, 0.18);
   font-style: normal;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .home-header .header-cta:hover {
@@ -484,6 +486,232 @@
 
 .vision p:last-child {
   color: rgba(255, 255, 255, 0.68);
+}
+
+.values-section {
+  margin-top: 42px;
+}
+
+.values-heading {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: 80px;
+  align-items: end;
+  margin-top: 58px;
+}
+
+.values-heading h2 {
+  font-size: clamp(2.8rem, 5vw, 5rem);
+}
+
+.values-heading > p {
+  max-width: 52ch;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 42px;
+}
+
+.value-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(245, 245, 245, 0.9) 100%);
+  box-shadow: 0 24px 46px rgba(17, 17, 17, 0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 52px rgba(17, 17, 17, 0.12);
+}
+
+.value-card-icon {
+  display: grid;
+  place-items: center;
+  height: 150px;
+  padding: 28px 24px 16px;
+}
+
+.value-card-icon svg {
+  width: 88px;
+  height: 88px;
+  overflow: visible;
+  transform-origin: center;
+}
+
+.value-card-icon svg path,
+.value-card-icon svg circle {
+  fill: none;
+  stroke: #111111;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.value-card-band {
+  display: flex;
+  align-items: center;
+  min-height: 62px;
+  padding: 0 26px;
+  color: var(--white);
+  font-size: 1.02rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.value-card-body {
+  padding: 20px 26px 28px;
+}
+
+.value-card-body ul {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.value-card-body li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.value-card-body li::before {
+  position: absolute;
+  top: 0.55rem;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+  opacity: 0.42;
+}
+
+.value-card-integrity .value-card-band {
+  background: linear-gradient(90deg, #00b5e2 0%, #0899c2 100%);
+}
+
+.value-card-quality .value-card-band {
+  background: linear-gradient(90deg, #e4007c 0%, #c5006b 100%);
+}
+
+.value-card-customer .value-card-band {
+  color: #101b1c;
+  background: linear-gradient(90deg, #ffd200 0%, #f1c300 100%);
+}
+
+.value-card-innovation .value-card-band {
+  background: linear-gradient(90deg, #111111 0%, #2b2b2b 100%);
+}
+
+.value-card-integrity .value-card-icon svg {
+  animation: value-icon-integrity 5.8s ease-in-out infinite;
+}
+
+.value-card-quality .value-card-icon svg {
+  animation: value-icon-quality 5.2s ease-in-out infinite;
+}
+
+.value-card-customer .value-card-icon svg {
+  animation: value-icon-customer 5.4s ease-in-out infinite;
+}
+
+.value-card-innovation .value-card-icon svg {
+  animation: value-icon-innovation 5.8s ease-in-out infinite;
+}
+
+.value-card-innovation .value-card-icon {
+  padding-top: 32px;
+}
+
+@keyframes value-icon-integrity {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-3px) scale(1.02) rotate(-1.2deg); }
+  70% { transform: translateY(0) scale(0.995) rotate(0.8deg); }
+}
+
+@keyframes value-icon-quality {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.03); }
+}
+
+@keyframes value-icon-customer {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) scale(1.02); }
+}
+
+@keyframes value-icon-innovation {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.03) rotate(1.4deg); }
+}
+
+.value-card-integrity .icon-handshake {
+  transform-origin: center;
+  animation: value-handshake-sway 5.8s ease-in-out infinite;
+}
+
+.value-card-quality .icon-check {
+  stroke-dasharray: 10;
+  stroke-dashoffset: 10;
+  animation: value-check-draw 5.2s ease-in-out infinite;
+}
+
+.value-card-customer .icon-headset {
+  transform-origin: center;
+  animation: value-headset-sway 5.6s ease-in-out infinite;
+}
+
+.value-card-customer .icon-headset-base {
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  animation: value-headset-base 5.6s ease-in-out infinite;
+}
+
+.value-card-innovation .icon-puzzle {
+  transform-origin: center;
+  animation: value-puzzle-shift 5.8s ease-in-out infinite;
+}
+
+@keyframes value-handshake-sway {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  45% { transform: rotate(2deg) scale(1.015); }
+  70% { transform: rotate(-1.5deg) scale(1); }
+}
+
+@keyframes value-check-draw {
+  0%, 16% { stroke-dashoffset: 10; }
+  34%, 78% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 10; }
+}
+
+@keyframes value-headset-sway {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-1.4deg); }
+}
+
+@keyframes value-headset-base {
+  0%, 18% { stroke-dashoffset: 14; }
+  34%, 78% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 14; }
+}
+
+@keyframes value-puzzle-shift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px) rotate(1.2deg) scale(1.015); }
 }
 
 .sustainable-impact {
@@ -1386,10 +1614,15 @@
 
   .about-title-grid,
   .about-detail-grid,
+  .values-heading,
   .sustainability-heading,
   .contact-layout {
     grid-template-columns: 1fr;
     gap: 45px;
+  }
+
+  .values-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .impact-content {
@@ -1403,6 +1636,10 @@
 
   .purpose-card {
     padding: 45px;
+  }
+
+  .values-section {
+    margin-top: 26px;
   }
 
   .sustainability-heading .eyebrow {
@@ -1451,8 +1688,21 @@
   }
 
   .purpose-grid,
+  .values-grid,
   .service-grid {
     grid-template-columns: 1fr;
+  }
+
+  .values-heading {
+    gap: 28px;
+  }
+
+  .value-card-icon {
+    height: 126px;
+  }
+
+  .value-card-body {
+    padding: 18px 22px 24px;
   }
 
   .purpose-card {
