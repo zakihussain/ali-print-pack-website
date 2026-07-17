@@ -98,12 +98,17 @@
 }
 
 .page-foil-stamping {
-  --catalog-hero-image: url("../images/services/finishing/foil-stamping/hero.jpg");
+  --catalog-hero-image: url("../images/services/finishing/foil-stamping/hero-generated.png");
   --catalog-hero-position: center 48%;
 }
 
 .page-hot-lamination {
-  --catalog-hero-image: url("../images/services/finishing/hot-lamination/hero.jpg");
+  --catalog-hero-image: url("../images/services/finishing/hot-lamination/hero-generated.png");
+  --catalog-hero-position: center center;
+}
+
+.page-silk-screen-printing {
+  --catalog-hero-image: url("../images/services/silk-screen-printing/hero-generated.png");
   --catalog-hero-position: center center;
 }
 
@@ -113,7 +118,7 @@
 }
 
 .page-uv-eyelet {
-  --catalog-hero-image: url("../images/services/finishing/uv-eyelet/hero.jpg");
+  --catalog-hero-image: url("../images/services/finishing/uv-eyelet/hero-generated.png");
   --catalog-hero-position: center center;
 }
 
@@ -210,6 +215,33 @@
 .service-page-card:hover img {
   filter: saturate(1);
   transform: scale(1.045);
+}
+
+.service-page-card-precision-cutting img {
+  transform: scale(1.14);
+  transform-origin: center center;
+}
+
+.service-page-card-precision-cutting:hover img {
+  transform: scale(1.19);
+}
+
+.service-page-card-die-cutting img {
+  transform: scale(1);
+  transform-origin: center center;
+}
+
+.service-page-card-die-cutting:hover img {
+  transform: scale(1.03);
+}
+
+.service-page-card-folding-gluing img {
+  transform: scale(1.28);
+  transform-origin: center center;
+}
+
+.service-page-card-folding-gluing:hover img {
+  transform: scale(1.31);
 }
 
 .service-page-card span,
@@ -425,6 +457,24 @@
   height: 100%;
   object-fit: contain;
   object-position: center center;
+}
+
+.page-folding-gluing .offset-machine-media {
+  padding: 0;
+  overflow: hidden;
+}
+
+.page-folding-gluing .folding-gluing-machine-media img {
+  transition: transform 0.35s ease;
+  transform-origin: center center;
+}
+
+.page-folding-gluing .folding-gluing-machine-media-hoson img {
+  transform: scale(0.96);
+}
+
+.page-folding-gluing .folding-gluing-machine-media-rongda img {
+  transform: scale(1.38);
 }
 
 .offset-machine-facts {
