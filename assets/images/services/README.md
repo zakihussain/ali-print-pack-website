@@ -10,7 +10,7 @@ Files correspond to:
 
 1. Offset Printing
 2. Digital Printing
-3. Flexographic Printing
+3. Printed Fabric Label (PFL)
 4. RFID
 5. Screen Printing
 6. Woven Labels

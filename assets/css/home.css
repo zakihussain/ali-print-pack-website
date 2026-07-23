@@ -922,6 +922,12 @@
   gap: 26px 24px;
 }
 
+.services-grid-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+
 .service-card {
   position: relative;
   min-height: 210px;
@@ -987,6 +993,16 @@
 .service-card span {
   top: 16px;
   left: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  color: var(--white);
+  border-radius: 8px;
+  background: rgba(8, 16, 17, 0.9);
+  box-shadow: 0 10px 22px rgba(8, 16, 17, 0.24);
   font-size: 0.54rem;
   font-weight: 850;
 }
@@ -1680,6 +1696,10 @@
 
   .service-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .services-grid-footer {
+    justify-content: flex-start;
   }
 
 }

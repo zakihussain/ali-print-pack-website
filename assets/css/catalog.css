@@ -24,8 +24,8 @@
 }
 
 .page-services {
-  --catalog-hero-image: url("../images/services/offset-printing.webp");
-  --catalog-hero-position: center 40%;
+  --catalog-hero-image: url("../images/services/services-products-hero-generated.png");
+  --catalog-hero-position: center center;
 }
 
 .page-services .catalog-hero h1 {
@@ -109,6 +109,21 @@
 
 .page-silk-screen-printing {
   --catalog-hero-image: url("../images/services/silk-screen-printing/hero-generated.png");
+  --catalog-hero-position: center center;
+}
+
+.page-pfl {
+  --catalog-hero-image: url("../images/services/pfl/hero-generated.png");
+  --catalog-hero-position: center center;
+}
+
+.page-htl {
+  --catalog-hero-image: url("../images/services/htl/hero-generated.png");
+  --catalog-hero-position: center center;
+}
+
+.page-thermal-printing {
+  --catalog-hero-image: url("../images/services/thermal-printing/hero-generated.png");
   --catalog-hero-position: center center;
 }
 
@@ -254,6 +269,16 @@
 .service-page-card span {
   top: 16px;
   left: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  color: var(--white);
+  border-radius: 8px;
+  background: rgba(8, 16, 17, 0.9);
+  box-shadow: 0 10px 22px rgba(8, 16, 17, 0.24);
   font-size: 0.54rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -277,6 +302,178 @@
   border-radius: 50%;
   background: var(--lime);
   font-style: normal;
+}
+
+.catalog-section-future-services {
+  padding-top: 0;
+}
+
+.service-page-card-future {
+  cursor: pointer;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  border: 0;
+  font: inherit;
+  appearance: none;
+}
+
+.service-page-card-future img {
+  filter: saturate(0.5) brightness(0.88);
+}
+
+.service-page-card-future h2 {
+  bottom: 16px;
+  right: 16px;
+}
+
+.service-page-card-future .future-note {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-page-card-future .future-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(8, 16, 17, 0.56);
+  backdrop-filter: blur(8px);
+}
+
+.service-page-card-future .future-status svg {
+  width: 14px;
+  height: 14px;
+  fill: #ffffff;
+}
+
+.service-page-card-future:hover .future-status {
+  background: rgba(8, 16, 17, 0.72);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.future-service-modal[hidden] {
+  display: none;
+}
+
+.future-service-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.future-service-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 16, 17, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.future-service-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 620px);
+  padding: 44px 48px 40px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 181, 226, 0.12), transparent 25%),
+    radial-gradient(circle at top right, rgba(228, 0, 124, 0.08), transparent 25%),
+    radial-gradient(circle at bottom right, rgba(255, 210, 0, 0.12), transparent 27%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.995) 0%, rgba(246, 247, 249, 0.99) 100%);
+  box-shadow: 0 32px 70px rgba(17, 17, 17, 0.24);
+}
+
+.future-service-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: rgba(16, 27, 28, 0.72);
+  border: 0;
+  border-radius: 50%;
+  background: rgba(16, 27, 28, 0.06);
+  padding: 0;
+  cursor: pointer;
+}
+
+.future-service-modal__close svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.future-service-modal__close:hover {
+  color: var(--ink);
+  background: rgba(16, 27, 28, 0.12);
+}
+
+.future-service-modal__icon {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  margin-bottom: 24px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(0, 181, 226, 0.18) 0%, rgba(255, 210, 0, 0.18) 100%);
+}
+
+.future-service-modal__icon svg {
+  width: 34px;
+  height: 34px;
+  fill: var(--ink);
+}
+
+.future-service-modal__eyebrow {
+  margin: 0 0 14px;
+  color: rgba(16, 27, 28, 0.52);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.future-service-modal__dialog h2 {
+  margin: 0 0 20px;
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(2.2rem, 4.2vw, 3.9rem);
+  line-height: 1;
+}
+
+.future-service-modal__copy {
+  margin: 0 0 20px;
+  max-width: 44ch;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.future-service-modal__note {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
 }
 
 .service-detail-main {
@@ -408,8 +605,8 @@
 }
 
 .offset-intro-panel .service-detail-grid {
-  grid-template-columns: 1fr;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
+  align-items: center;
 }
 
 .offset-intro-panel .service-detail-points article {
@@ -419,6 +616,40 @@
 
 .offset-intro-panel .service-detail-points strong {
   color: var(--white);
+}
+
+.offset-intro-panel .service-detail-image-card-ctp img {
+  min-height: 540px;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.page-silk-screen-printing .service-detail-image-card-silk-section img {
+  object-position: 28% center;
+}
+
+.page-pfl .service-detail-image-card-pfl img {
+  min-height: 540px;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.page-pfl .pfl-machine-media-jr1531 img {
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(0.88);
+}
+
+.page-pfl .pfl-machine-media-h90 img {
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(0.82);
+}
+
+.page-thermal-printing .thermal-machine-media img {
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(1.06);
 }
 
 .offset-intro-panel .service-detail-points p {
@@ -1036,10 +1267,6 @@
 
 .ctp-machine-facts article {
   min-height: 92px;
-}
-
-.ctp-machine-facts article:last-child {
-  grid-column: 1 / -1;
 }
 
 .ctp-machine-facts strong {

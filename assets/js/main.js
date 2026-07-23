@@ -524,6 +524,46 @@ const setupQuoteCountryPhone = () => {
   });
 };
 
+const setupFutureServicesModal = () => {
+  const modal = document.querySelector("[data-future-modal]");
+  if (!modal) return;
+
+  const title = modal.querySelector("#future-service-title");
+  const copy = modal.querySelector("[data-future-modal-copy]");
+  const triggers = document.querySelectorAll("[data-future-service]");
+  const closeControls = modal.querySelectorAll("[data-future-modal-close]");
+
+  const closeModal = () => {
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  };
+
+  const openModal = (serviceName, serviceCopy) => {
+    if (title) title.textContent = serviceName;
+    if (copy) copy.textContent = serviceCopy;
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  };
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      openModal(
+        trigger.getAttribute("data-future-service") || "Upcoming capability",
+        trigger.getAttribute("data-future-copy") ||
+          "We are currently developing this capability as part of our future production expansion."
+      );
+    });
+  });
+
+  closeControls.forEach((control) => {
+    control.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) closeModal();
+  });
+};
+
 const closeMenu = () => {
   if (!menuButton || !menu) return;
   menuButton.setAttribute("aria-expanded", "false");
@@ -572,3 +612,4 @@ setupPageTransitions();
 setupBrandLoop();
 setupCopyButtons();
 setupQuoteCountryPhone();
+setupFutureServicesModal();
