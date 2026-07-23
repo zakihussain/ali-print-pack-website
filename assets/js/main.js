@@ -17,10 +17,18 @@ const loaderWhiteSrc = new URL("../images/logo/loader-white.png", mainScriptSrc)
 const loaderWord1Src = new URL("../images/logo/logo word 1.png", mainScriptSrc).href;
 const loaderWord2Src = new URL("../images/logo/logo word 2.png", mainScriptSrc).href;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const navigationEntry =
+  performance.getEntriesByType && performance.getEntriesByType("navigation")
+    ? performance.getEntriesByType("navigation")[0]
+    : null;
+const navigationEntryType = navigationEntry?.type || "";
 const previousLoaderMode = sessionStorage.getItem("app-loader-mode");
 const previousLoaderTimestamp = Number(sessionStorage.getItem("app-loader-timestamp") || 0);
 const arrivedFromPageTransition =
   previousLoaderMode === "page-transition" && Date.now() - previousLoaderTimestamp < 5000;
+const arrivedFromServiceTransition =
+  previousLoaderMode === "service-subpage-transition" &&
+  Date.now() - previousLoaderTimestamp < 5000;
 
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
@@ -85,6 +93,30 @@ const createPageLoader = () => {
 
 const pageLoader = createPageLoader();
 
+const createServiceTransitionOverlay = () => {
+  const existingOverlay = document.querySelector(".service-transition");
+  if (existingOverlay) return existingOverlay;
+
+  const overlay = document.createElement("div");
+  overlay.className = "service-transition";
+  overlay.setAttribute("aria-hidden", "true");
+  overlay.innerHTML = `
+    <div class="service-transition__inner">
+      <div class="service-transition__pill">
+        <span class="service-transition__segment service-transition__segment--cyan"></span>
+        <span class="service-transition__segment service-transition__segment--magenta"></span>
+        <span class="service-transition__segment service-transition__segment--yellow"></span>
+        <span class="service-transition__segment service-transition__segment--black"></span>
+      </div>
+    </div>
+  `;
+
+  document.body.append(overlay);
+  return overlay;
+};
+
+const serviceTransitionOverlay = createServiceTransitionOverlay();
+
 const showPageLoader = (animate = true) => {
   if (!pageLoader) return;
   pageLoader.classList.add("is-instant");
@@ -110,9 +142,127 @@ const hidePageLoader = () => {
   document.body.classList.remove("page-loader-active");
 };
 
+const showServiceTransition = () => {
+  if (!serviceTransitionOverlay) return;
+  serviceTransitionOverlay.classList.add("is-instant");
+  document.body.classList.add("service-transition-active");
+  serviceTransitionOverlay.classList.add("is-visible");
+  void serviceTransitionOverlay.offsetWidth;
+  document.documentElement.classList.remove("page-preload");
+  serviceTransitionOverlay.classList.remove("is-animating");
+  void serviceTransitionOverlay.offsetWidth;
+  serviceTransitionOverlay.classList.add("is-animating");
+  window.requestAnimationFrame(() => {
+    serviceTransitionOverlay.classList.remove("is-instant");
+  });
+};
+
+const hideServiceTransition = () => {
+  if (!serviceTransitionOverlay) return;
+  document.documentElement.classList.remove("page-preload");
+  serviceTransitionOverlay.classList.remove("is-visible", "is-animating", "is-instant");
+  document.body.classList.remove("service-transition-active");
+};
+
+const normalizePagePath = (pathname) =>
+  pathname.replace(/\/index\.html$/i, "/").replace(/\/{2,}/g, "/");
+
+const isServiceAreaPath = (pathname) => normalizePagePath(pathname).includes("/services/");
+
+const isServiceDetailPath = (pathname) => /\/services\/[^/]+\/$/i.test(normalizePagePath(pathname));
+
+const arrivedFromServiceHistoryNavigation =
+  navigationEntryType === "back_forward" && isServiceAreaPath(window.location.pathname);
+
+const hasServiceAreaReferrer = () => {
+  if (!document.referrer) return false;
+
+  try {
+    const referrerUrl = new URL(document.referrer, window.location.href);
+    return (
+      referrerUrl.origin === window.location.origin &&
+      isServiceAreaPath(referrerUrl.pathname) &&
+      referrerUrl.href !== window.location.href
+    );
+  } catch (error) {
+    return false;
+  }
+};
+
+const shouldUseServiceSubpageTransition = (currentUrl, destinationUrl) =>
+  isServiceAreaPath(currentUrl.pathname) &&
+  isServiceAreaPath(destinationUrl.pathname) &&
+  (isServiceDetailPath(currentUrl.pathname) || isServiceDetailPath(destinationUrl.pathname));
+
+const setupServiceBackButton = () => {
+  if (!isServiceDetailPath(window.location.pathname)) return;
+  if (document.querySelector(".service-back-button")) return;
+
+  const fallbackUrl = new URL("../index.html", window.location.href);
+  const button = document.createElement("a");
+  button.className = "service-back-button";
+  button.href = fallbackUrl.href;
+  button.setAttribute("aria-label", "Back to Services & Products");
+  button.innerHTML = `
+    <span class="service-back-button__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="service-back-button__text">Back to Services</span>
+  `;
+
+  button.addEventListener("click", (event) => {
+    if (hasServiceAreaReferrer()) {
+      event.preventDefault();
+      closeMenu();
+      history.back();
+    }
+  });
+
+  document.body.append(button);
+};
+
 const setupPageLoader = () => {
   sessionStorage.removeItem("app-loader-mode");
   sessionStorage.removeItem("app-loader-timestamp");
+
+  if (arrivedFromServiceTransition) {
+    document.documentElement.classList.remove("page-preload");
+
+    window.addEventListener("load", () => {
+      window.scrollTo(0, 0);
+      updateHeader();
+      hideServiceTransition();
+    });
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) hideServiceTransition();
+    });
+
+    return;
+  }
+
+  if (arrivedFromServiceHistoryNavigation) {
+    showServiceTransition();
+
+    const quickHideDelay = reducedMotionQuery.matches ? 80 : 340;
+
+    window.addEventListener("load", () => {
+      window.scrollTo(0, 0);
+      updateHeader();
+      window.setTimeout(hideServiceTransition, quickHideDelay);
+    });
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.scrollTo(0, 0);
+        hideServiceTransition();
+      }
+    });
+
+    return;
+  }
 
   showPageLoader(true);
 
@@ -175,13 +325,20 @@ const setupPageTransitions = () => {
     isNavigating = true;
     event.preventDefault();
     closeMenu();
-    showPageLoader(false);
-    sessionStorage.setItem("app-loader-mode", "page-transition");
+    const useServiceTransition = shouldUseServiceSubpageTransition(current, destination);
+
+    if (useServiceTransition) {
+      showServiceTransition();
+      sessionStorage.setItem("app-loader-mode", "service-subpage-transition");
+    } else {
+      showPageLoader(false);
+      sessionStorage.setItem("app-loader-mode", "page-transition");
+    }
     sessionStorage.setItem("app-loader-timestamp", String(Date.now()));
 
     window.setTimeout(() => {
       window.location.href = destination.href;
-    }, reducedMotionQuery.matches ? 60 : 180);
+    }, reducedMotionQuery.matches ? 60 : useServiceTransition ? 220 : 180);
   });
 };
 
@@ -610,6 +767,7 @@ updateHeader();
 setupPageLoader();
 setupPageTransitions();
 setupBrandLoop();
+setupServiceBackButton();
 setupCopyButtons();
 setupQuoteCountryPhone();
 setupFutureServicesModal();
