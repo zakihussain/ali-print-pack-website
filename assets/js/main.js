@@ -9,6 +9,7 @@ const mainScript =
   document.currentScript ||
   Array.from(document.scripts).find((script) => script.src.includes("assets/js/main.js"));
 const mainScriptSrc = mainScript?.src || window.location.href;
+const siteRootUrl = new URL("../../", mainScriptSrc);
 const loaderCyanSrc = new URL("../images/logo/loader-cyan.png", mainScriptSrc).href;
 const loaderMagentaSrc = new URL("../images/logo/loader-magenta.png", mainScriptSrc).href;
 const loaderYellowSrc = new URL("../images/logo/loader-yellow.png", mainScriptSrc).href;
@@ -92,6 +93,13 @@ const createPageLoader = () => {
 };
 
 const pageLoader = createPageLoader();
+
+const resetFormUiState = () => {
+  document.body.classList.remove("modal-open");
+  document.querySelectorAll(".form-success-modal").forEach((modal) => {
+    modal.hidden = true;
+  });
+};
 
 const createServiceTransitionOverlay = () => {
   const existingOverlay = document.querySelector(".service-transition");
@@ -224,6 +232,7 @@ const setupServiceBackButton = () => {
 };
 
 const setupPageLoader = () => {
+  resetFormUiState();
   sessionStorage.removeItem("app-loader-mode");
   sessionStorage.removeItem("app-loader-timestamp");
 
@@ -721,6 +730,173 @@ const setupFutureServicesModal = () => {
   });
 };
 
+const setupFormSubmitSuccessRedirects = () => {
+  const forms = document.querySelectorAll('form[action*="formsubmit.co"]');
+  if (!forms.length) return;
+
+  const pageLabels = {
+    "/contact/": "contact",
+    "/quote/": "quote",
+    "/careers/": "careers",
+  };
+
+  forms.forEach((form) => {
+    let nextInput = form.querySelector('input[name="_next"]');
+    if (!nextInput) {
+      nextInput = document.createElement("input");
+      nextInput.type = "hidden";
+      nextInput.name = "_next";
+      form.append(nextInput);
+    }
+
+    const currentUrl = new URL(window.location.href);
+    const normalizedPath = normalizePagePath(currentUrl.pathname);
+    const source = pageLabels[normalizedPath] || "form";
+    const thankYouUrl = new URL("thank-you/index.html", siteRootUrl.href);
+    thankYouUrl.searchParams.set("source", source);
+    thankYouUrl.searchParams.set("return", currentUrl.href);
+
+    nextInput.value = thankYouUrl.href;
+  });
+};
+
+const setupCountUp = () => {
+  const counters = document.querySelectorAll("[data-countup]");
+  if (!counters.length) return;
+
+  const formatNumber = (value) => new Intl.NumberFormat("en-US").format(value);
+
+  const animateCounter = (element) => {
+    if (element.dataset.counted === "true") return;
+    element.dataset.counted = "true";
+
+    const target = Number(element.dataset.target || 0);
+    const startValue = Number(element.dataset.start ?? 0);
+    const suffix = element.dataset.suffix || "";
+    const duration = Number(element.dataset.duration || 1600);
+    const start = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(startValue + (target - startValue) * eased);
+      element.textContent = `${formatNumber(value)}${suffix}`;
+
+      if (progress < 1) {
+        window.requestAnimationFrame(tick);
+      } else {
+        element.textContent = `${formatNumber(target)}${suffix}`;
+      }
+    };
+
+    window.requestAnimationFrame(tick);
+  };
+
+  if ("IntersectionObserver" in window) {
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.45 });
+
+    counters.forEach((counter) => counterObserver.observe(counter));
+  } else {
+    counters.forEach(animateCounter);
+  }
+};
+
+const setupCalendarYears = () => {
+  const yearElements = document.querySelectorAll("[data-calendar-year]");
+  if (!yearElements.length) return;
+
+  const buildYear = (element) => {
+    if (element.dataset.ready === "true") return;
+    element.dataset.ready = "true";
+
+    const digits = (element.dataset.calendarYear || "").replace(/\D/g, "");
+    if (!digits) return;
+
+    element.innerHTML = "";
+
+    digits.split("").forEach((digit, index) => {
+      const targetDigit = Number(digit);
+      const column = document.createElement("span");
+      column.className = "calendar-year__digit";
+
+      const track = document.createElement("span");
+      track.className = "calendar-year__track";
+
+      const sequence =
+        index === 0 && targetDigit === 1
+          ? [0, 1]
+          : targetDigit === 0
+            ? [0]
+            : Array.from({ length: targetDigit }, (_, stepIndex) => stepIndex + 1);
+
+      column.dataset.targetDigit = String(targetDigit);
+      column.dataset.sequenceLength = String(sequence.length);
+
+      sequence.forEach((value) => {
+        const item = document.createElement("span");
+        item.className = "calendar-year__item";
+        item.textContent = String(value);
+        track.append(item);
+      });
+
+      column.append(track);
+      element.append(column);
+    });
+  };
+
+  const animateYear = async (element) => {
+    if (element.dataset.animated === "true") return;
+    element.dataset.animated = "true";
+
+    const columns = [...element.querySelectorAll(".calendar-year__digit")];
+
+    for (const [index, column] of columns.entries()) {
+      const track = column.querySelector(".calendar-year__track");
+      const sequenceLength = Number(column.dataset.sequenceLength || 1);
+
+      if (!track || sequenceLength <= 1) continue;
+
+      const stepHeight = column.getBoundingClientRect().height;
+      const shift = (sequenceLength - 1) * stepHeight;
+      const duration = index === 0 ? 220 : Math.max(680, (sequenceLength - 1) * 88);
+
+      track.style.transitionDuration = `${duration}ms`;
+      track.style.transform = "translateY(0)";
+
+      await new Promise((resolve) => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            track.style.transform = `translateY(-${shift}px)`;
+            window.setTimeout(resolve, duration + 80);
+          });
+        });
+      });
+    }
+  };
+
+  yearElements.forEach(buildYear);
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateYear(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.55 });
+
+    yearElements.forEach((element) => observer.observe(element));
+  } else {
+    yearElements.forEach(animateYear);
+  }
+};
+
 const closeMenu = () => {
   if (!menuButton || !menu) return;
   menuButton.setAttribute("aria-expanded", "false");
@@ -741,6 +917,7 @@ window.addEventListener("scroll", updateHeader, { passive: true });
 window.addEventListener("resize", () => {
   if (window.innerWidth > 1100) closeMenu();
 });
+window.addEventListener("pageshow", resetFormUiState);
 
 document.querySelectorAll("[data-year]").forEach((item) => {
   item.textContent = new Date().getFullYear();
@@ -771,3 +948,7 @@ setupServiceBackButton();
 setupCopyButtons();
 setupQuoteCountryPhone();
 setupFutureServicesModal();
+setupFormSubmitSuccessRedirects();
+setupCountUp();
+setupCalendarYears();
+

@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="../assets/css/page.css">
   <script>document.documentElement.classList.add('page-preload');</script>
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.2/build/js/intlTelInput.min.js" defer></script>
-  <script src="../assets/js/main.js" defer></script>
+  <script src="../assets/js/form-submit.js?v=20260803-1" defer></script>
+  <script src="../assets/js/main.js?v=20260729-2" defer></script>
 </head>
 <body class="quote-page page-quote">
   <header class="site-header home-header" data-header>
@@ -50,10 +51,9 @@
             <p>Please fill in the form below with your contact details and project description so we can review your request and send the right quotation.</p>
           </div>
 
-          <form class="quote-form" action="https://formsubmit.co/info@aliprintpack.com" method="POST">
+          <form class="quote-form" action="https://formsubmit.co/info@aliprintpack.com" method="POST" data-formsubmit-ajax data-form-type="quote">
             <input type="hidden" name="_subject" value="Ali Print Pack quote request">
             <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="false">
             <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="contact-honeypot">
             <input type="hidden" name="country_name" value="Pakistan" data-country-name>
             <input type="hidden" name="country_iso" value="pk" data-country-iso>

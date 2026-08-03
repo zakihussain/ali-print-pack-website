@@ -358,6 +358,75 @@
   font-weight: 400;
 }
 
+.since-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.14em;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.calendar-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+  margin-left: 0.02em;
+  transform: translateY(0.03em);
+}
+
+.calendar-year__digit {
+  position: relative;
+  display: inline-block;
+  width: 0.9em;
+  height: 1.14em;
+  overflow: hidden;
+  color: var(--orange);
+  border: 1px solid rgba(228, 0, 124, 0.2);
+  border-radius: 0.18em;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 246, 252, 0.9) 100%);
+  box-shadow:
+    0 0.08em 0.24em rgba(17, 17, 17, 0.08),
+    inset 0 -0.06em 0 rgba(228, 0, 124, 0.08);
+}
+
+.calendar-year__digit::after {
+  content: "";
+  position: absolute;
+  left: 0.08em;
+  right: 0.08em;
+  top: 50%;
+  height: 1px;
+  background: rgba(228, 0, 124, 0.16);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.calendar-year__track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.22, 0.88, 0.24, 1);
+  will-change: transform;
+}
+
+.calendar-year__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 1.14em;
+  line-height: 1;
+  font: inherit;
+  color: inherit;
+  transform: translateY(-0.09em);
+}
+
 .about-lead {
   margin-bottom: 8px;
   font-size: clamp(1.2rem, 2vw, 1.65rem);
@@ -367,9 +436,14 @@
 
 .about-detail-grid {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 1.08fr 0.92fr;
   margin: 90px 0 110px;
-  gap: 100px;
+  gap: 72px;
+}
+
+.about-stats-grid {
+  display: grid;
+  gap: 24px;
 }
 
 .home-about-summary .about-detail-grid {
@@ -419,6 +493,67 @@
   font-weight: 850;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.about-number-combined {
+  min-height: 385px;
+  padding: 22px;
+  align-items: end;
+}
+
+.about-number-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 14px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.about-number-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 156px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  background: rgba(8, 16, 17, 0.34);
+  backdrop-filter: blur(8px);
+}
+
+.about-number-stat strong,
+.about-number-stat span {
+  position: relative;
+  z-index: 1;
+}
+
+.about-number-stat strong {
+  max-width: 100%;
+  font-size: clamp(2.7rem, 4.2vw, 4.9rem);
+  letter-spacing: -0.065em;
+  line-height: 0.88;
+  white-space: nowrap;
+}
+
+.about-number-stat span {
+  max-width: 100%;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about-number-stat--space strong {
+  color: var(--cyan);
+}
+
+.about-number-stat--team strong {
+  color: var(--yellow);
 }
 
 .about-body {
@@ -846,6 +981,12 @@
   background-position: center;
   border-radius: 18px;
   box-shadow: 0 20px 40px rgba(6, 16, 17, 0.18);
+  transform: translateY(22px) scale(0.985);
+  opacity: 0;
+  transition:
+    transform 700ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 350ms ease,
+    opacity 700ms ease;
 }
 
 .impact-metrics article::before {
@@ -855,7 +996,46 @@
     linear-gradient(180deg, rgba(7, 22, 24, 0.18) 0%, rgba(7, 22, 24, 0.72) 100%),
     linear-gradient(135deg, rgba(0, 198, 255, 0.16) 0%, rgba(7, 22, 24, 0.05) 45%, rgba(255, 0, 138, 0.16) 100%);
   content: "";
-  z-index: -1;
+  z-index: 0;
+}
+
+.impact-metrics article::after {
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: -38%;
+  width: 34%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.12) 48%, transparent 100%);
+  content: "";
+  opacity: 0;
+  transform: skewX(-18deg) translateX(0);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.impact-metrics.reveal.visible article {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.impact-metrics.reveal.visible article:nth-child(1) { transition-delay: 0ms; }
+.impact-metrics.reveal.visible article:nth-child(2) { transition-delay: 120ms; }
+.impact-metrics.reveal.visible article:nth-child(3) { transition-delay: 240ms; }
+.impact-metrics.reveal.visible article:nth-child(4) { transition-delay: 360ms; }
+
+.impact-metrics.reveal.visible article::after {
+  opacity: 1;
+  animation: impact-card-sheen 1200ms ease forwards;
+}
+
+.impact-metrics.reveal.visible article:nth-child(1)::after { animation-delay: 2140ms; }
+.impact-metrics.reveal.visible article:nth-child(2)::after { animation-delay: 2260ms; }
+.impact-metrics.reveal.visible article:nth-child(3)::after { animation-delay: 2380ms; }
+.impact-metrics.reveal.visible article:nth-child(4)::after { animation-delay: 2500ms; }
+
+.impact-metrics article:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 26px 50px rgba(6, 16, 17, 0.24);
 }
 
 .impact-metrics article:nth-child(1) {
@@ -879,6 +1059,8 @@
 }
 
 .impact-metrics strong {
+  position: relative;
+  z-index: 2;
   color: var(--lime);
   font-size: clamp(2rem, 3.2vw, 3.5rem);
   letter-spacing: -0.07em;
@@ -886,6 +1068,8 @@
 }
 
 .impact-metrics span {
+  position: relative;
+  z-index: 2;
   max-width: 190px;
   margin-top: 10px;
   color: rgba(255, 255, 255, 0.62);
@@ -893,6 +1077,135 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.impact-card--efficiency .impact-progress {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: min(170px, 78%);
+  height: 4px;
+  margin-top: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.impact-card--efficiency .impact-progress b {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd200 0%, #ff8a00 100%);
+  box-shadow: 0 0 18px rgba(255, 210, 0, 0.28);
+  transition: width 2100ms cubic-bezier(0.2, 0.9, 0.2, 1) 420ms;
+}
+
+.impact-metrics.reveal.visible .impact-card--efficiency .impact-progress b {
+  width: 70%;
+}
+
+.impact-card--biofuel strong {
+  text-shadow: 0 0 0 rgba(255, 210, 0, 0);
+  transition: text-shadow 260ms ease;
+}
+
+.impact-metrics.reveal.visible .impact-card--biofuel strong {
+  animation: impact-number-warm-glow 700ms ease 2920ms 1;
+}
+
+.impact-card--emissions strong::after {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 2.1em;
+  height: 2.1em;
+  border: 1px solid rgba(199, 241, 90, 0.42);
+  border-radius: 50%;
+  content: "";
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.7);
+}
+
+.impact-metrics.reveal.visible .impact-card--emissions strong::after {
+  animation: impact-clean-ring 760ms ease 2920ms 1 forwards;
+}
+
+.impact-card--solar strong {
+  text-shadow: 0 0 0 rgba(0, 198, 255, 0);
+}
+
+.impact-metrics.reveal.visible .impact-card--solar strong {
+  animation: impact-solar-glow 2200ms ease-in-out 2800ms infinite alternate;
+}
+
+@keyframes impact-card-sheen {
+  0% {
+    transform: skewX(-18deg) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: skewX(-18deg) translateX(420%);
+    opacity: 0;
+  }
+}
+
+@keyframes impact-number-warm-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 0 rgba(255, 210, 0, 0);
+  }
+  50% {
+    text-shadow: 0 0 18px rgba(255, 210, 0, 0.26);
+  }
+}
+
+@keyframes impact-clean-ring {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes impact-solar-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 0 rgba(0, 198, 255, 0);
+  }
+  50% {
+    text-shadow: 0 0 22px rgba(0, 198, 255, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impact-metrics article,
+  .impact-metrics article::after,
+  .impact-card--biofuel strong,
+  .impact-card--emissions strong::after,
+  .impact-card--solar strong,
+  .impact-card--efficiency .impact-progress b {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .impact-metrics article {
+    transform: none;
+    opacity: 1;
+  }
+
+  .impact-card--efficiency .impact-progress b {
+    width: 70%;
+  }
 }
 
 .impact-copy {
@@ -1675,6 +1988,24 @@
 
   .about-detail-grid {
     margin: 65px 0 85px;
+    gap: 44px;
+  }
+
+  .about-stats-grid {
+    gap: 18px;
+  }
+
+  .about-number-combined {
+    min-height: 340px;
+  }
+
+  .about-number-grid {
+    gap: 12px;
+  }
+
+  .about-number-stat {
+    min-height: 138px;
+    padding: 16px;
   }
 
   .purpose-card {

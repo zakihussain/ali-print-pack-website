@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="../assets/css/home.css">
   <link rel="stylesheet" href="../assets/css/page.css">
   <script>document.documentElement.classList.add('page-preload');</script>
-  <script src="../assets/js/main.js" defer></script>
+  <script src="../assets/js/form-submit.js?v=20260803-1" defer></script>
+  <script src="../assets/js/main.js?v=20260729-2" defer></script>
 </head>
 <body class="contact-page page-contact">
   <header class="site-header home-header" data-header>
@@ -104,10 +105,9 @@
               <p>Use this form for general contact, business inquiries and direct communication with Ali Print Pack.</p>
             </div>
 
-            <form class="contact-form" action="https://formsubmit.co/info@aliprintpack.com" method="POST">
+            <form class="contact-form" action="https://formsubmit.co/info@aliprintpack.com" method="POST" data-formsubmit-ajax data-form-type="contact">
               <input type="hidden" name="_subject" value="Ali Print Pack contact message">
               <input type="hidden" name="_template" value="table">
-              <input type="hidden" name="_captcha" value="false">
               <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="contact-honeypot">
 
               <div class="contact-form-grid">
